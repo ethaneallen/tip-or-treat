@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#495057">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tip Split">
+<link rel="manifest" href="./manifest.json">
+<title>Tip & Split Calculator</title>
+<style>
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    background-color: #f0f2f5; 
+    margin: 0; 
+    padding: 20px; 
+    display: flex; 
+    justify-content: center; 
+  }
+  .calculator { 
+    background: white; 
+    width: 100%; 
+    max-width: 400px; 
+    border-radius: 12px; 
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+    padding: 20px; 
+    box-sizing: border-box;
+  }
+  .header { 
+    text-align: center; 
+    font-size: 24px; 
+    font-weight: bold; 
+    margin-bottom: 20px; 
+    color: #333;
+  }
+  .row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 0; 
+    border-bottom: 1px solid #e1e4e8; 
+    font-size: 18px;
+    color: #444;
+  }
+  .row:last-child { border-bottom: none; }
+  .highlight { 
+    background-color: #ffc107; 
+    padding: 15px; 
+    border-radius: 8px; 
+    font-weight: bold; 
+    color: #000;
+    margin: 10px 0;
+    border: none;
+  }
+  .controls { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+  }
+  input { 
+    width: 80px; 
+    text-align: right; 
+    font-size: 20px; 
+    font-weight: bold;
+    border: 1px solid #ccc; 
+    border-radius: 6px; 
+    padding: 8px; 
+    background: #fafafa;
+  }
+  button { 
+    background: #495057; 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    width: 40px; 
+    height: 40px; 
+    font-size: 24px; 
+    cursor: pointer; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  button:active { background: #343a40; }
+  .value-display { font-size: 22px; font-weight: bold; color: #000; }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="header">Tip & Split</div>
+  
+  <div class="row">
+    <span>Bill Amount $</span>
+    <div class="controls">
+      <input type="number" id="bill" value="0.00" step="0.01" oninput="calculate('bill')">
+    </div>
+  </div>
+
+  <div class="row">
+    <span>Tip Percent (%)</span>
+    <div class="controls">
+      <button onclick="adjust('tip', -1)">-</button>
+      <input type="number" id="tip" value="15" oninput="calculate('percent')">
+      <button onclick="adjust('tip', 1)">+</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <span>Tip Amount $</span>
+    <div class="controls">
+      <input type="number" id="tipAmount" value="0.00" step="0.01" oninput="calculate('amount')">
+    </div>
+  </div>
+
+  <div class="row highlight">
+    <span>Total Amount $</span>
+    <span class="value-display" id="totalAmount">0.00</span>
+  </div>
+
+  <div class="row">
+    <span>No. of People</span>
+    <div class="controls">
+      <button onclick="adjust('people', -1)">-</button>
+      <input type="number" id="people" value="1" oninput="calculate('people')">
+      <button onclick="adjust('people', 1)">+</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <span>Each Person Pays $</span>
+    <span class="value-display" id="eachPays">0.00</span>
+  </div>
+</div>
+
+<script>
+  function adjust(field, amount) {
+    let input = document.getElementById(field);
+    let currentValue = parseInt(input.value) || 0;
+    let newValue = currentValue + amount;
+    if (field === 'people' && newValue < 1) newValue = 1;
+    if (field === 'tip' && newValue < 0) newValue = 0;
+    input.value = newValue;
+    calculate('percent');
+  }
+
+  function calculate(source) {
+    let bill = parseFloat(document.getElementById('bill').value) || 0;
+    let tipPercentInput = document.getElementById('tip');
+    let tipAmountInput = document.getElementById('tipAmount');
+    let people = parseInt(document.getElementById('people').value) || 1;
+
+    let tipAmount = parseFloat(tipAmountInput.value) || 0;
+    let tipPercent = parseFloat(tipPercentInput.value) || 0;
+
+    if (source === 'percent' || source === 'bill' || source === 'people') {
+        tipAmount = bill * (tipPercent / 100);
+        tipAmountInput.value = tipAmount.toFixed(2);
+    } else if (source === 'amount') {
+        if (bill > 0) {
+            tipPercent = (tipAmount / bill) * 100;
+            tipPercentInput.value = Math.round(tipPercent);
+        }
+    }
+
+    let totalAmount = bill + tipAmount;
+    let eachPays = totalAmount / people;
+
+    document.getElementById('totalAmount').innerText = totalAmount.toFixed(2);
+    document.getElementById('eachPays').innerText = eachPays.toFixed(2);
+  }
+
+  // Register service worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
+
+</body>
+</html>
