@@ -1,12 +1,15 @@
 {
+  "id": "./",
   "name": "Tip & Split Calculator",
   "short_name": "Tip Split",
-  "description": "Calculate tips and split bills easily",
+  "description": "Polished tip and split calculator with quick presets, smart rounding, and offline support.",
   "start_url": "./tip-split.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#f0f2f5",
-  "theme_color": "#495057",
+  "background_color": "#eef4f7",
+  "theme_color": "#124559",
   "orientation": "portrait-primary",
+  "lang": "en-US",
   "categories": ["utilities", "finance"],
   "icons": [
     {

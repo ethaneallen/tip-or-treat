@@ -5,9 +5,15 @@ A clean, lightweight tip and bill-splitting calculator built as a single-page Pr
 ## ✨ Features
 
 - **Tip by percentage or amount** — enter a tip % and the dollar amount updates automatically, or type a custom tip amount and the percentage syncs back
+- **Tax-aware tipping** — choose whether tip is calculated before tax or after tax
 - **Bill splitting** — divide the total evenly across any number of people
+- **Quick tip presets** — one-tap 10%, 15%, 18%, 20%, and 25% chips
+- **Round-up mode** — optionally round total up to the next whole dollar
+- **Uneven split mode** — set custom per-person weight for flexible group splits
+- **Share summary** — send or copy a clean breakdown of bill, tax, tip, total, and split
+- **Saved state** — bill, tip, split count, and settings persist between visits
 - **Installable PWA** — add it to your home screen and use it offline like a native app
-- **Mobile-first design** — responsive layout optimized for phones, works great on desktop too
+- **Premium mobile-first design** — improved typography, gradients, and accessibility-friendly controls
 - **Zero dependencies** — a single HTML file with inline CSS and JS
 
 ## 📸 Preview
@@ -43,9 +49,14 @@ sw.js            ← service worker for offline support
 | Input | Effect |
 |---|---|
 | **Bill Amount** | Base amount before tip |
-| **Tip Percent** | Calculates tip from the bill (use +/- buttons or type directly) |
+| **Tax Amount** | Included in total and optionally included in tip base |
+| **Tip Mode (Before/After Tax)** | Controls whether tip is calculated on bill only or bill + tax |
+| **Tip Percent** | Calculates tip from the bill (use +/- buttons, chips, or type directly) |
 | **Tip Amount** | Override the tip in dollars — the percent adjusts to match |
 | **No. of People** | Splits the total (bill + tip) evenly |
+| **Round total up** | Rounds the total to a clean dollar amount |
+| **Uneven split** | Uses person weights to divide total unequally |
+| **Share Summary** | Shares/copies a ready-to-send payment summary |
 
 The **Total Amount** and **Each Person Pays** fields update in real time as you change any input.
 
