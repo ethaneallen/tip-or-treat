@@ -1,6 +1,6 @@
-# 💵 Tip & Split Calculator
+# 🎃 Tip or Treat Calculator 👻
 
-A clean, lightweight tip and bill-splitting calculator built as a single-page Progressive Web App (PWA). No frameworks, no dependencies — just HTML, CSS, and JavaScript.
+A clean, lightweight tip calculator and bill-splitting app built as a single-page Progressive Web App (PWA). No frameworks, no dependencies — just HTML, CSS, and JavaScript.
 
 ## ✨ Features
 

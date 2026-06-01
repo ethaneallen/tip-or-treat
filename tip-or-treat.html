@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3e3e3e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tip or Treat">
+<meta name="description" content="Compact tip calculator with split support and quick total rounding.">
+<link rel="manifest" href="./manifest.json">
+<title>Tip or Treat</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700;800&display=swap');
+
+  :root {
+    --bg: #cfcfcf;
+    --row: #f1f1f1;
+    --row-border: #bbbbbb;
+    --ink: #111111;
+    --btn: #3f3f3f;
+    --btn-ink: #ffffff;
+    --highlight: #f7b500;
+    --focus: #2563eb;
+    --elev-1: 0 2px 6px rgba(0, 0, 0, 0.16);
+    --elev-2: 0 8px 24px rgba(0, 0, 0, 0.22);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--bg);
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    color: var(--ink);
+    padding: 12px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 4px 2px;
+  }
+
+  .title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .mini {
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  .rows {
+    display: grid;
+    gap: 4px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) 48px minmax(140px, 190px) 48px;
+    align-items: center;
+    gap: 6px;
+    background: var(--row);
+    border: 1px solid var(--row-border);
+    border-radius: 8px;
+    padding: 4px 6px;
+    min-height: 60px;
+    box-shadow: var(--elev-1);
+  }
+
+  .row.highlight {
+    background: var(--highlight);
+    border-color: #d59700;
+  }
+
+  .label {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .step {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #2c2c2c;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #4a4a4a 0%, #363636 100%);
+    color: var(--btn-ink);
+    font-size: 34px;
+    line-height: 1;
+    font-weight: 700;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.26);
+    transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  }
+
+  .step:hover {
+    filter: brightness(1.04);
+  }
+
+  .step:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .step:focus-visible,
+  .collapse-toggle:focus-visible,
+  .segment button:focus-visible,
+  .calc-btn:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--focus) 35%, transparent);
+    outline-offset: 1px;
+  }
+
+  .value-wrap {
+    position: relative;
+  }
+
+  .prefix {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 21px;
+    font-weight: 800;
+    pointer-events: none;
+  }
+
+  .value {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font-size: 28px;
+    font-weight: 800;
+    text-align: right;
+    color: var(--ink);
+    padding: 2px 4px;
+    font-family: inherit;
+  }
+
+  .value.money {
+    padding-left: 24px;
+  }
+
+  .value:focus {
+    outline: 3px solid color-mix(in srgb, var(--focus) 35%, transparent);
+    border-radius: 6px;
+  }
+
+  .collapse-toggle {
+    width: 100%;
+    margin-top: 8px;
+    border: 1px solid #7b7b7b;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #eeeeee 0%, #e1e1e1 100%);
+    padding: 10px 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    box-shadow: var(--elev-1);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+
+  .collapse-toggle:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  }
+
+  .advanced {
+    margin-top: 6px;
+    display: none;
+    gap: 4px;
+  }
+
+  .advanced.visible {
+    display: grid;
+  }
+
+  .advanced-row {
+    background: #efefef;
+    border: 1px solid #bcbcbc;
+    border-radius: 8px;
+    padding: 8px;
+    display: grid;
+    gap: 8px;
+    box-shadow: var(--elev-1);
+  }
+
+  .adv-inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .adv-label {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .adv-input {
+    width: 130px;
+    font-size: 26px;
+    font-weight: 800;
+    text-align: right;
+    font-family: inherit;
+    border: 1px solid #9b9b9b;
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: #fff;
+  }
+
+  .segment {
+    display: inline-flex;
+    border: 1px solid #989898;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+
+  .segment button {
+    border: 0;
+    background: #e6e6e6;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 120ms ease, color 120ms ease, filter 120ms ease;
+  }
+
+  .segment button:hover {
+    filter: brightness(0.98);
+  }
+
+  .segment button.active {
+    background: #3f3f3f;
+    color: #fff;
+  }
+
+  .foot {
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .calc-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.58));
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+    padding: 0 10px;
+  }
+
+  .calc-overlay.open {
+    display: flex;
+    animation: fade-in 150ms ease;
+  }
+
+  .calc-sheet {
+    width: 100%;
+    max-width: 520px;
+    background: linear-gradient(180deg, #f8f8f8 0%, #ececec 100%);
+    border: 1px solid #9e9e9e;
+    border-radius: 16px 16px 0 0;
+    padding: 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    box-shadow: var(--elev-2);
+    animation: slide-up 180ms ease;
+  }
+
+  .calc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .calc-title {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+  }
+
+  .calc-display {
+    width: 100%;
+    border: 1px solid #8d8d8d;
+    background: #fff;
+    border-radius: 10px;
+    text-align: right;
+    font-size: 30px;
+    font-weight: 800;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    min-height: 54px;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .calc-display:focus {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08), 0 0 0 3px color-mix(in srgb, var(--focus) 30%, transparent);
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .calc-btn {
+    min-height: 48px;
+    border: 1px solid #7f7f7f;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #fdfdfd 0%, #ececec 100%);
+    font-size: 22px;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 2px 4px rgba(0, 0, 0, 0.18);
+    transition: transform 110ms ease, box-shadow 110ms ease, filter 110ms ease;
+  }
+
+  .calc-btn.action {
+    background: linear-gradient(180deg, #ececec 0%, #dadada 100%);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .calc-btn.primary {
+    background: linear-gradient(180deg, #2f2f2f 0%, #1f1f1f 100%);
+    color: #fff;
+  }
+
+  .calc-btn:hover {
+    filter: brightness(1.03);
+  }
+
+  .calc-btn:active {
+    transform: translateY(1px) scale(0.985);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.25);
+  }
+
+  .calc-btn.success {
+    background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+    color: #fff;
+    border-color: #166534;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { transform: translateY(14px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @media (max-width: 420px) {
+    .label { font-size: 16px; }
+    .value { font-size: 24px; }
+    .prefix { font-size: 18px; }
+    .step { width: 44px; height: 44px; font-size: 30px; }
+    .row { grid-template-columns: minmax(118px, 1fr) 44px minmax(122px, 150px) 44px; }
+  }
+
+  @media (max-height: 760px) {
+    body { padding: 8px; }
+    .topbar { margin-bottom: 6px; }
+    .title { font-size: 24px; }
+    .rows { gap: 3px; }
+    .row { min-height: 56px; padding: 3px 5px; }
+    .step { width: 44px; height: 44px; font-size: 30px; }
+    .value { font-size: 24px; }
+    .collapse-toggle { margin-top: 6px; padding: 9px 10px; }
+    .foot { margin-top: 6px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <h1 class="title">🎃 Tip or Treat 👻</h1>
+    <div class="mini" id="modeBadge">After Tax</div>
+  </div>
+
+  <div class="rows" aria-live="polite">
+    <div class="row">
+      <div class="label">Bill Amount</div>
+      <button class="step" type="button" id="billDown" aria-label="Decrease bill">-</button>
+      <div class="value-wrap">
+        <span class="prefix">$</span>
+        <input class="value money" type="text" id="bill" inputmode="decimal" value="0.00" aria-label="Bill amount">
+      </div>
+      <button class="step" type="button" id="billUp" aria-label="Increase bill">+</button>
+    </div>
+
+    <div class="row">
+      <div class="label">Tip Percent (%)</div>
+      <button class="step" type="button" id="tipDown" aria-label="Decrease tip percent">-</button>
+      <input class="value" type="number" id="tip" min="0" max="100" step="1" value="20" aria-label="Tip percent">
+      <button class="step" type="button" id="tipUp" aria-label="Increase tip percent">+</button>
+    </div>
+
+    <div class="row">
+      <div class="label">Tip Amount</div>
+      <button class="step" type="button" id="tipAmountDown" aria-label="Decrease tip amount">-</button>
+      <div class="value-wrap">
+        <span class="prefix">$</span>
+        <input class="value money" type="text" id="tipAmount" inputmode="decimal" value="0.00" aria-label="Tip amount">
+      </div>
+      <button class="step" type="button" id="tipAmountUp" aria-label="Increase tip amount">+</button>
+    </div>
+
+    <div class="row highlight">
+      <div class="label">Total Amount</div>
+      <button class="step" type="button" id="totalDown" aria-label="Round total down">-</button>
+      <div class="value-wrap">
+        <span class="prefix">$</span>
+        <input class="value money" type="text" id="totalAmount" inputmode="decimal" value="0.00" aria-label="Total amount">
+      </div>
+      <button class="step" type="button" id="totalUp" aria-label="Round total up">+</button>
+    </div>
+  </div>
+
+  <button class="collapse-toggle" id="advancedToggle" type="button" aria-expanded="false">Show More Settings</button>
+
+  <div class="advanced" id="advancedPanel">
+    <div class="advanced-row">
+      <div class="adv-inline">
+        <label class="adv-label" for="taxAmount">Tax Amount</label>
+        <input class="adv-input" type="text" id="taxAmount" inputmode="decimal" value="0.00" aria-label="Tax amount">
+      </div>
+      <div class="adv-inline">
+        <span class="adv-label">Tip Calculated On</span>
+        <div class="segment" role="group" aria-label="Tip mode">
+          <button id="tipModeBefore" type="button">Before Tax</button>
+          <button id="tipModeAfter" type="button" class="active">After Tax</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="advanced-row">
+      <div class="adv-inline">
+        <label class="adv-label" for="people">No. of People</label>
+        <input class="adv-input" type="number" id="people" min="1" max="99" step="1" value="1" aria-label="Number of people">
+      </div>
+      <div class="adv-inline">
+        <div class="adv-label">Each Person Pays</div>
+        <div class="adv-label" id="eachPays">$0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot" id="statusText">Tip is 20%.</div>
+</div>
+
+<div class="calc-overlay" id="billCalcOverlay" aria-hidden="true">
+  <div class="calc-sheet" role="dialog" aria-modal="true" aria-label="Bill amount calculator">
+    <div class="calc-head">
+      <div class="calc-title" id="calcTitle">Calculator</div>
+      <button class="calc-btn action" type="button" id="billCalcClose">Close</button>
+    </div>
+    <input class="calc-display" type="text" id="billCalcDisplay" inputmode="decimal" autocomplete="off" aria-label="Calculator value" value="0.00">
+    <div class="calc-grid">
+      <button class="calc-btn action" type="button" data-calc="clear">C</button>
+      <button class="calc-btn action" type="button" data-calc="back">⌫</button>
+      <button class="calc-btn action" type="button" data-calc="+1">+1</button>
+      <button class="calc-btn action" type="button" data-calc="+10">+10</button>
+
+      <button class="calc-btn" type="button" data-calc="7">7</button>
+      <button class="calc-btn" type="button" data-calc="8">8</button>
+      <button class="calc-btn" type="button" data-calc="9">9</button>
+      <button class="calc-btn action" type="button" data-calc="00">00</button>
+
+      <button class="calc-btn" type="button" data-calc="4">4</button>
+      <button class="calc-btn" type="button" data-calc="5">5</button>
+      <button class="calc-btn" type="button" data-calc="6">6</button>
+      <button class="calc-btn" type="button" data-calc=".">.</button>
+
+      <button class="calc-btn" type="button" data-calc="1">1</button>
+      <button class="calc-btn" type="button" data-calc="2">2</button>
+      <button class="calc-btn" type="button" data-calc="3">3</button>
+      <button class="calc-btn primary" type="button" id="billCalcApply">Use</button>
+
+      <button class="calc-btn" type="button" data-calc="0" style="grid-column: span 4;">0</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'tip-or-treat-compact-v2';
+
+  const billInput = document.getElementById('bill');
+  const tipPercentInput = document.getElementById('tip');
+  const tipAmountInput = document.getElementById('tipAmount');
+  const totalInput = document.getElementById('totalAmount');
+  const taxInput = document.getElementById('taxAmount');
+  const peopleInput = document.getElementById('people');
+  const eachPaysEl = document.getElementById('eachPays');
+  const statusTextEl = document.getElementById('statusText');
+  const modeBadgeEl = document.getElementById('modeBadge');
+  const tipModeBeforeBtn = document.getElementById('tipModeBefore');
+  const tipModeAfterBtn = document.getElementById('tipModeAfter');
+  const advancedToggle = document.getElementById('advancedToggle');
+  const advancedPanel = document.getElementById('advancedPanel');
+  const billCalcOverlay = document.getElementById('billCalcOverlay');
+  const calcTitleEl = document.getElementById('calcTitle');
+  const billCalcDisplay = document.getElementById('billCalcDisplay');
+  const billCalcClose = document.getElementById('billCalcClose');
+  const billCalcApply = document.getElementById('billCalcApply');
+
+  let billCalcBuffer = '0';
+  let activeCalcTarget = 'bill';
+
+  const calcConfig = {
+    bill: {
+      title: 'Bill Amount',
+      decimals: 2,
+      getValue: () => parseFloatSafe(billInput.value),
+      applyValue: (value) => {
+        billInput.value = formatMoney(value);
+        appState.calculationMode = 'percent';
+        calculate();
+      }
+    },
+    tipPercent: {
+      title: 'Tip Percent (%)',
+      decimals: 0,
+      getValue: () => parseFloatSafe(tipPercentInput.value),
+      applyValue: (value) => {
+        tipPercentInput.value = String(clamp(Math.round(value), 0, 100));
+        appState.calculationMode = 'percent';
+        calculate();
+      }
+    },
+    tipAmount: {
+      title: 'Tip Amount',
+      decimals: 2,
+      getValue: () => parseFloatSafe(tipAmountInput.value),
+      applyValue: (value) => {
+        tipAmountInput.value = formatMoney(value);
+        appState.calculationMode = 'amount';
+        calculate();
+      }
+    },
+    total: {
+      title: 'Total Amount',
+      decimals: 2,
+      getValue: () => parseFloatSafe(totalInput.value),
+      applyValue: (value) => {
+        applyTotal(value);
+      }
+    },
+    tax: {
+      title: 'Tax Amount',
+      decimals: 2,
+      getValue: () => parseFloatSafe(taxInput.value),
+      applyValue: (value) => {
+        taxInput.value = formatMoney(value);
+        appState.calculationMode = 'percent';
+        calculate();
+      }
+    },
+    people: {
+      title: 'No. of People',
+      decimals: 0,
+      getValue: () => parseFloatSafe(peopleInput.value),
+      applyValue: (value) => {
+        peopleInput.value = String(clamp(Math.round(value), 1, 99));
+        calculate();
+      }
+    }
+  };
+
+  const appState = {
+    tipMode: 'after',
+    calculationMode: 'percent'
+  };
+
+  function tapHaptic() {
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function parseFloatSafe(value) {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function parseIntSafe(value) {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function sanitizeDecimal(value, decimals) {
+    const cleaned = String(value).replace(/[^0-9.]/g, '');
+    const [whole, ...rest] = cleaned.split('.');
+    if (!rest.length) {
+      return whole;
+    }
+    return `${whole}.${rest.join('').slice(0, decimals)}`;
+  }
+
+  function formatMoney(value) {
+    return clamp(value, 0, 9999999).toFixed(2);
+  }
+
+  function setTipMode(mode) {
+    appState.tipMode = mode === 'after' ? 'after' : 'before';
+    tipModeBeforeBtn.classList.toggle('active', appState.tipMode === 'before');
+    tipModeAfterBtn.classList.toggle('active', appState.tipMode === 'after');
+    modeBadgeEl.textContent = appState.tipMode === 'after' ? 'After Tax' : 'Before Tax';
+    calculate();
+  }
+
+  function getValues() {
+    return {
+      bill: clamp(parseFloatSafe(billInput.value), 0, 9999999),
+      tipPercent: clamp(parseFloatSafe(tipPercentInput.value), 0, 100),
+      tipAmount: clamp(parseFloatSafe(tipAmountInput.value), 0, 9999999),
+      tax: clamp(parseFloatSafe(taxInput.value), 0, 9999999),
+      people: clamp(parseIntSafe(peopleInput.value) || 1, 1, 99)
+    };
+  }
+
+  function calculate(source = 'auto') {
+    const { bill, tipPercent, tipAmount, tax, people } = getValues();
+    const tipBase = appState.tipMode === 'after' ? bill + tax : bill;
+
+    let nextTipAmount = tipAmount;
+    let nextTipPercent = tipPercent;
+
+    if (appState.calculationMode === 'amount') {
+      nextTipPercent = tipBase > 0 ? (nextTipAmount / tipBase) * 100 : 0;
+      nextTipPercent = clamp(nextTipPercent, 0, 100);
+    } else {
+      nextTipAmount = tipBase * (nextTipPercent / 100);
+    }
+
+    const total = bill + tax + nextTipAmount;
+    const each = people > 0 ? total / people : total;
+
+    const isBillEditing = document.activeElement === billInput && (source === 'bill-input' || source === 'auto');
+    const isTipAmountEditing = document.activeElement === tipAmountInput && (source === 'tip-amount-input' || source === 'auto');
+    const isTaxEditing = document.activeElement === taxInput && (source === 'tax-input' || source === 'auto');
+
+    if (!isBillEditing) {
+      billInput.value = formatMoney(bill);
+    }
+    tipPercentInput.value = String(Math.round(nextTipPercent));
+    if (!isTipAmountEditing) {
+      tipAmountInput.value = formatMoney(nextTipAmount);
+    }
+    totalInput.value = formatMoney(total);
+    if (!isTaxEditing) {
+      taxInput.value = formatMoney(tax);
+    }
+    peopleInput.value = String(people);
+    eachPaysEl.textContent = `$${formatMoney(each)}`;
+    statusTextEl.textContent = `Tip: $${formatMoney(nextTipAmount)} (${Math.round(nextTipPercent)}%)`;
+
+    saveState();
+  }
+
+  function applyTotal(targetTotal) {
+    const { bill, tax } = getValues();
+    const minTotal = bill + tax;
+    const nextTotal = Math.max(targetTotal, minTotal);
+    const nextTip = Math.max(0, nextTotal - bill - tax);
+    tipAmountInput.value = formatMoney(nextTip);
+    appState.calculationMode = 'amount';
+    calculate();
+  }
+
+  function roundTotalUp() {
+    const currentTotal = clamp(parseFloatSafe(totalInput.value), 0, 9999999);
+    const next = Math.abs(currentTotal - Math.ceil(currentTotal)) < 0.0001
+      ? currentTotal + 1
+      : Math.ceil(currentTotal);
+    applyTotal(next);
+  }
+
+  function roundTotalDown() {
+    const currentTotal = clamp(parseFloatSafe(totalInput.value), 0, 9999999);
+    const next = Math.abs(currentTotal - Math.floor(currentTotal)) < 0.0001
+      ? currentTotal - 1
+      : Math.floor(currentTotal);
+    applyTotal(Math.max(0, next));
+  }
+
+  function stepMoney(inputEl, delta) {
+    const value = clamp(parseFloatSafe(inputEl.value) + delta, 0, 9999999);
+    inputEl.value = formatMoney(value);
+  }
+
+  function stepMoneyToWhole(inputEl, direction) {
+    const current = clamp(parseFloatSafe(inputEl.value), 0, 9999999);
+    let next = current;
+
+    if (direction > 0) {
+      next = Math.abs(current - Math.ceil(current)) < 0.0001
+        ? current + 1
+        : Math.ceil(current);
+    } else {
+      next = Math.abs(current - Math.floor(current)) < 0.0001
+        ? current - 1
+        : Math.floor(current);
+    }
+
+    inputEl.value = formatMoney(clamp(next, 0, 9999999));
+  }
+
+  function getActiveCalcDecimals() {
+    return calcConfig[activeCalcTarget]?.decimals ?? 2;
+  }
+
+  function formatCalcDisplay(value) {
+    const decimals = getActiveCalcDecimals();
+    if (decimals === 0) {
+      const numeric = clamp(parseFloatSafe(value), 0, 9999999);
+      return String(Math.round(numeric));
+    }
+
+    const text = String(value);
+    if (text.endsWith('.')) {
+      return text;
+    }
+
+    const [whole, fraction = ''] = text.split('.');
+    if (text.includes('.')) {
+      return `${whole || '0'}.${fraction.slice(0, decimals)}`;
+    }
+
+    const numeric = clamp(parseFloatSafe(text), 0, 9999999);
+    return numeric.toFixed(2);
+  }
+
+  function normalizeCalcBuffer() {
+    let cleaned = String(billCalcBuffer).replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) {
+      cleaned = `${parts[0]}.${parts.slice(1).join('')}`;
+    }
+
+    const hasTrailingDot = cleaned.endsWith('.');
+    const [whole, decimals = ''] = cleaned.split('.');
+    const wholeNorm = whole.length ? whole : '0';
+    const decimalsNorm = decimals.slice(0, getActiveCalcDecimals());
+    if (getActiveCalcDecimals() > 0 && hasTrailingDot && decimalsNorm.length === 0) {
+      billCalcBuffer = `${wholeNorm}.`;
+    } else {
+      billCalcBuffer = decimalsNorm.length ? `${wholeNorm}.${decimalsNorm}` : wholeNorm;
+    }
+
+    if (getActiveCalcDecimals() === 0) {
+      billCalcBuffer = wholeNorm;
+    }
+  }
+
+  function syncBillCalcDisplay() {
+    normalizeCalcBuffer();
+    billCalcDisplay.value = formatCalcDisplay(billCalcBuffer);
+  }
+
+  function openBillCalculator(targetKey) {
+    activeCalcTarget = targetKey;
+    const cfg = calcConfig[targetKey] || calcConfig.bill;
+    calcTitleEl.textContent = `${cfg.title} Calculator`;
+    billCalcBuffer = String(cfg.getValue() || 0);
+    syncBillCalcDisplay();
+    billCalcDisplay.setAttribute('inputmode', getActiveCalcDecimals() === 0 ? 'numeric' : 'decimal');
+    billCalcOverlay.classList.add('open');
+    billCalcOverlay.setAttribute('aria-hidden', 'false');
+
+    // Allow direct keyboard entry in the calculator input.
+    setTimeout(() => {
+      billCalcDisplay.focus();
+      billCalcDisplay.select();
+    }, 0);
+  }
+
+  function closeBillCalculator() {
+    billCalcOverlay.classList.remove('open');
+    billCalcOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  function applyBillCalculator() {
+    const cfg = calcConfig[activeCalcTarget] || calcConfig.bill;
+    const value = clamp(parseFloatSafe(billCalcBuffer), 0, 9999999);
+    cfg.applyValue(value);
+
+    // Quick success micro-feedback before dismiss.
+    const originalLabel = billCalcApply.textContent;
+    billCalcApply.textContent = 'Applied';
+    billCalcApply.classList.add('success');
+    setTimeout(() => {
+      billCalcApply.textContent = originalLabel;
+      billCalcApply.classList.remove('success');
+      closeBillCalculator();
+    }, 300);
+  }
+
+  function onBillCalcKey(key) {
+    tapHaptic();
+
+    if (key === 'clear') {
+      billCalcBuffer = '0';
+      syncBillCalcDisplay();
+      return;
+    }
+
+    if (key === 'back') {
+      billCalcBuffer = billCalcBuffer.length > 1 ? billCalcBuffer.slice(0, -1) : '0';
+      if (billCalcBuffer === '-' || billCalcBuffer === '') {
+        billCalcBuffer = '0';
+      }
+      syncBillCalcDisplay();
+      return;
+    }
+
+    if (key === '+1' || key === '+10') {
+      const increment = key === '+10' ? 10 : 1;
+      billCalcBuffer = String(clamp(parseFloatSafe(billCalcBuffer) + increment, 0, 9999999));
+      syncBillCalcDisplay();
+      return;
+    }
+
+    if (key === '.') {
+      if (getActiveCalcDecimals() === 0) {
+        return;
+      }
+      if (!billCalcBuffer.includes('.')) {
+        billCalcBuffer += '.';
+      }
+      syncBillCalcDisplay();
+      return;
+    }
+
+    if (/^\d+$/.test(key)) {
+      if (billCalcBuffer === '0') {
+        billCalcBuffer = key;
+      } else {
+        billCalcBuffer += key;
+      }
+      syncBillCalcDisplay();
+    }
+  }
+
+  function saveState() {
+    const payload = {
+      bill: billInput.value,
+      tipPercent: tipPercentInput.value,
+      tipAmount: tipAmountInput.value,
+      totalAmount: totalInput.value,
+      taxAmount: taxInput.value,
+      people: peopleInput.value,
+      tipMode: appState.tipMode,
+      calculationMode: appState.calculationMode
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch (error) {
+      // Ignore storage failures.
+    }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        return;
+      }
+
+      const data = JSON.parse(raw);
+      if (typeof data.bill === 'string') billInput.value = data.bill;
+      if (typeof data.tipPercent === 'string') tipPercentInput.value = data.tipPercent;
+      if (typeof data.tipAmount === 'string') tipAmountInput.value = data.tipAmount;
+      if (typeof data.totalAmount === 'string') totalInput.value = data.totalAmount;
+      if (typeof data.taxAmount === 'string') taxInput.value = data.taxAmount;
+      if (typeof data.people === 'string') peopleInput.value = data.people;
+      // Keep default startup mode as After Tax for real bill usage.
+      appState.tipMode = 'after';
+      if (data.calculationMode === 'percent' || data.calculationMode === 'amount') appState.calculationMode = data.calculationMode;
+
+      // Always start collapsed for faster in-restaurant use.
+      advancedPanel.classList.remove('visible');
+      advancedToggle.textContent = 'Show More Settings';
+      advancedToggle.setAttribute('aria-expanded', 'false');
+    } catch (error) {
+      // Ignore malformed state.
+    }
+  }
+
+  function attachEvents() {
+    // Core row +/- buttons
+    document.getElementById('billDown').addEventListener('click', () => {
+      tapHaptic();
+      stepMoney(billInput, -1);
+      appState.calculationMode = 'percent';
+      calculate();
+    });
+    document.getElementById('billUp').addEventListener('click', () => {
+      tapHaptic();
+      stepMoney(billInput, 1);
+      appState.calculationMode = 'percent';
+      calculate();
+    });
+
+    document.getElementById('tipDown').addEventListener('click', () => {
+      tapHaptic();
+      tipPercentInput.value = String(clamp(parseIntSafe(tipPercentInput.value) - 1, 0, 100));
+      appState.calculationMode = 'percent';
+      calculate();
+    });
+    document.getElementById('tipUp').addEventListener('click', () => {
+      tapHaptic();
+      tipPercentInput.value = String(clamp(parseIntSafe(tipPercentInput.value) + 1, 0, 100));
+      appState.calculationMode = 'percent';
+      calculate();
+    });
+
+    document.getElementById('tipAmountDown').addEventListener('click', () => {
+      tapHaptic();
+      stepMoneyToWhole(tipAmountInput, -1);
+      appState.calculationMode = 'amount';
+      calculate();
+    });
+    document.getElementById('tipAmountUp').addEventListener('click', () => {
+      tapHaptic();
+      stepMoneyToWhole(tipAmountInput, 1);
+      appState.calculationMode = 'amount';
+      calculate();
+    });
+
+    document.getElementById('totalDown').addEventListener('click', () => {
+      tapHaptic();
+      roundTotalDown();
+    });
+    document.getElementById('totalUp').addEventListener('click', () => {
+      tapHaptic();
+      roundTotalUp();
+    });
+
+    // Calculator entry for all numeric fields.
+    [
+      [billInput, 'bill'],
+      [tipPercentInput, 'tipPercent'],
+      [tipAmountInput, 'tipAmount'],
+      [totalInput, 'total'],
+      [taxInput, 'tax'],
+      [peopleInput, 'people']
+    ].forEach(([inputEl, targetKey]) => {
+      inputEl.setAttribute('readonly', 'readonly');
+      inputEl.addEventListener('click', () => openBillCalculator(targetKey));
+      inputEl.addEventListener('focus', () => {
+        inputEl.blur();
+        openBillCalculator(targetKey);
+      });
+    });
+
+    tipModeBeforeBtn.addEventListener('click', () => setTipMode('before'));
+    tipModeAfterBtn.addEventListener('click', () => setTipMode('after'));
+
+    billCalcOverlay.addEventListener('click', (event) => {
+      if (event.target === billCalcOverlay) {
+        closeBillCalculator();
+      }
+    });
+    billCalcClose.addEventListener('click', () => {
+      tapHaptic();
+      closeBillCalculator();
+    });
+    billCalcApply.addEventListener('click', () => {
+      tapHaptic();
+      applyBillCalculator();
+    });
+
+    billCalcDisplay.addEventListener('input', () => {
+      let typed = sanitizeDecimal(billCalcDisplay.value, getActiveCalcDecimals());
+      if (getActiveCalcDecimals() === 0) {
+        typed = typed.split('.')[0];
+      }
+      billCalcBuffer = typed || '0';
+    });
+    billCalcDisplay.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        tapHaptic();
+        applyBillCalculator();
+      }
+    });
+
+    document.querySelectorAll('[data-calc]').forEach((button) => {
+      button.addEventListener('click', () => {
+        onBillCalcKey(button.dataset.calc);
+      });
+    });
+
+    advancedToggle.addEventListener('click', () => {
+      const nextVisible = !advancedPanel.classList.contains('visible');
+      advancedPanel.classList.toggle('visible', nextVisible);
+      advancedToggle.textContent = nextVisible ? 'Hide More Settings' : 'Show More Settings';
+      advancedToggle.setAttribute('aria-expanded', String(nextVisible));
+      saveState();
+    });
+  }
+
+  loadState();
+  setTipMode('after');
+  attachEvents();
+  calculate();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('./sw.js');
+        registration.update();
+      } catch (error) {
+        // Ignore service worker issues in unsupported environments.
+      }
+    });
+  }
+</script>
+</body>
+</html>
