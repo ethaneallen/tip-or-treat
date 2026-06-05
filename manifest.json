@@ -1,25 +1,25 @@
 {
   "id": "./",
-  "name": "Tip & Split Calculator",
-  "short_name": "Tip Split",
-  "description": "Polished tip and split calculator with quick presets, smart rounding, and offline support.",
+  "name": "Tip or Treat",
+  "short_name": "TipTreat",
+  "description": "Beautiful tip calculator & bill splitter with currency support, smart rounding, tipping guides, and offline support. No ads ever.",
   "start_url": "./tip-split.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eef4f7",
-  "theme_color": "#124559",
+  "background_color": "#0d0714",
+  "theme_color": "#140b1d",
   "orientation": "portrait-primary",
   "lang": "en-US",
   "categories": ["utilities", "finance"],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23f0f2f5' width='192' height='192'/%3E%3Ctext x='96' y='140' font-size='120' text-anchor='middle'%3E💵%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23140b1d' width='192' height='192' rx='32'/%3E%3Ctext x='96' y='140' font-size='120' text-anchor='middle'%3E💵%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23f0f2f5' width='512' height='512'/%3E%3Ctext x='256' y='380' font-size='320' text-anchor='middle'%3E💵%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23140b1d' width='512' height='512' rx='80'/%3E%3Ctext x='256' y='380' font-size='320' text-anchor='middle'%3E💵%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"

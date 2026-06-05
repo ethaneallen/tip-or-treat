@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tip-or-treat-v4';
+const CACHE_NAME = 'tip-or-treat-v5';
 const APP_SHELL = [
   './',
   './tip-split.html',

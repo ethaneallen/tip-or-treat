@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-label="Tip or Treat settings auto mode placeholder">
+  <rect width="1200" height="720" fill="#0a0507"/>
+  <rect x="120" y="80" width="960" height="560" rx="14" fill="#190b10" stroke="#6d1a25" stroke-width="3"/>
+  <text x="170" y="150" fill="#ffd7db" font-size="46" font-family="Segoe UI, Arial, sans-serif" font-weight="700">More Settings</text>
+  <text x="170" y="220" fill="#ff9aa3" font-size="30" font-family="Segoe UI, Arial, sans-serif">Horror Intensity: Auto / Light / Current / Extreme</text>
+  <text x="170" y="285" fill="#ffd7db" font-size="22" font-family="Segoe UI, Arial, sans-serif">Replace with real screenshot showing Auto mode controls.</text>
+</svg>

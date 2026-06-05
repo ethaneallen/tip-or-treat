@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-label="Tip or Treat demo flow placeholder">
+  <rect width="1200" height="720" fill="#090406"/>
+  <text x="140" y="160" fill="#ffd7db" font-size="52" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Demo GIF Placeholder</text>
+  <text x="140" y="235" fill="#ff9aa3" font-size="30" font-family="Segoe UI, Arial, sans-serif">Suggested output file: demo-flow.gif</text>
+  <text x="140" y="300" fill="#ffd7db" font-size="22" font-family="Segoe UI, Arial, sans-serif">Record quick flow: bill edit, tip adjust, Auto mode switch, total update.</text>
+</svg>
