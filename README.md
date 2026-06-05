@@ -4,6 +4,9 @@ Compact, mobile-first tip calculator with a Halloween/horror visual style, offli
 
 Built with plain HTML, CSS, and JavaScript.
 
+<img width="563" height="441" alt="image" src="https://github.com/user-attachments/assets/e436d834-6556-47e5-8bca-a769cabe6e11" />
+
+
 ## Features
 
 - Tip by percent or by amount (both stay synced)
@@ -15,26 +18,11 @@ Built with plain HTML, CSS, and JavaScript.
 - Installable PWA (manifest + service worker)
 - Horror theme with atmospheric effects
 
-## Screenshots and Demo
-
-Home screen (horror mode):
-
-![Tip or Treat horror home preview](docs/media/home-horror.svg)
-
-Settings and Auto intensity:
-
-![Tip or Treat auto intensity preview](docs/media/settings-auto.svg)
-
-Demo flow preview:
-
-![Tip or Treat demo flow placeholder](docs/media/demo-flow.svg)
-
 Media notes:
 
 - See docs/media/README.md for recommended real screenshot and GIF filenames.
 - Replace the SVG placeholders with your real captures before publishing if you want a fully polished repo front page.
 
-## What Was Updated Today
 
 ### Visual redesign (Halloween to horror)
 
